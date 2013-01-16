@@ -20,7 +20,7 @@
   (.setAttribute element (name attribute) (str value))
   nil)
 
-(defprim set-attribute [element value attribute -- element]
+(defprim set-attribute [element attribute value -- element]
   (set-attribute* element attribute value)
   (conj $ element))
 
