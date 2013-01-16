@@ -7,6 +7,8 @@
 
 (def ^:dynamic *document*)
 
+;;; Many of these primitives could probably be regular words if not for perf.
+
 (defprim create-element [tag -- element]
   (conj $
     (if (string? tag)
@@ -29,9 +31,34 @@
     (set-attribute* element attribute value))
   (conj $ element))
 
-(defprim append-child [parent child]
+(defprim append-child [parent child -- parent]
   (.appendChild parent child)
   (conj $ parent))
+
+(defprim append-children [parent children -- parent]
+  (doseq [child children]
+    (.appendChild parent child))
+  (conj $ parent))
+
+(defn- children* [element]
+  (let [nodes (.getChildNodes element)
+        length (.getLength nodes)]
+    (loop [i 0 children []]
+      (if (< i length)
+        (recur (inc i) (conj children (.item nodes i)))
+        children))))
+
+(defprim children [element -- children]
+  (conj $ (children* element)))
+
+(defprim remove-child [parent child -- parent]
+  (.removeChild parent child)
+  (conj $ parent))
+
+(defprim remove-children [element -- element]
+  (doseq [child (children* element)]
+    (.removeChild element child))
+  (conj $ element))
 
 (comment
 
@@ -39,12 +66,17 @@
     (fn [document]
       (binding [*document* document]
         (cat/run
+
           document-element
+          remove-children
+
           (create-element :svg/rect)
           (set-attributes {:x 70 :y 50
                            :width 10 :height 30
                            :fill "red"})
-          append-child)
+          append-child
+          )
+
         )))
 
 )
