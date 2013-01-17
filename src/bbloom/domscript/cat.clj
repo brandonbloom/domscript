@@ -48,6 +48,10 @@
 (defprim has-class? [element class -- element bool]
   (conj $ element (dom/has-class? element class)))
 
+(defprim set-classes [elements classes -- elements]
+  (dom/set-classes elements classes)
+  (conj $ elements))
+
 (defprim add-class [elements class -- elements]
   (dom/add-class elements class)
   (conj $ elements))
@@ -82,6 +86,23 @@
 
 (defprim set-styles [elements styles -- elements]
   (conj $ elements (dom/set-styles elements styles)))
+
+
+;;;; Data
+
+(defprim all-data [element -- element data]
+  (conj $ element (dom/all-data element)))
+
+(defprim get-data [element key]
+  (conj $ element (dom/get-data element key)))
+
+(defprim add-data [elements key value -- elements]
+  (dom/add-data elements key value)
+  (conj $ elements))
+
+(defprim remove-data [elements key -- elements]
+  (dom/remove-data elements key)
+  (conj $ elements))
 
 
 ;;;; Manipulation

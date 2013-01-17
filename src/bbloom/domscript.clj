@@ -13,8 +13,14 @@
         (cat/run
 
           (elements-with-tag :svg/rect)
+          cat/first
+          (add-data :foo 123)
+          (add-data :bar 456)
+          (remove-data :foo)
+          ;all-data cat/prn
+          (get-data :bar) cat/prn
           ;(set-style "fill" "#cc00cc")
-          (set-styles {:fill "#0000cc"})
+          ;(set-styles {:fill "#0000cc"})
           ;(remove-attribute :fill)
           ;cat/first (style :fill) cat/prn
 

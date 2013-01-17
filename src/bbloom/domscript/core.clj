@@ -98,7 +98,7 @@
 
 (defn update-classes [elements f & args]
   (each-element elements
-    #(set-classes elements (apply f (classes %) args))))
+    #(set-classes % (apply f (classes %) args))))
 
 (defn add-class [elements class]
   (update-classes elements conj class))
@@ -132,6 +132,30 @@
     #(doseq [[property value] styles]
        (.. % getStyle (setProperty (name property) value "")))))
 
+
+;;;; Data
+
+(def ^:private data-key "DomScript_data")
+
+(defn all-data [element]
+  (or (.getUserData element data-key) {}))
+
+(defn reset-data [elements data]
+  (each-element elements
+    #(.setUserData % data-key data nil)))
+
+(defn get-data [element key]
+  (get (all-data element) key))
+
+(defn swap-data [elements f & args]
+  (each-element elements
+    #(reset-data % (apply f (all-data %) args))))
+
+(defn add-data [elements key value]
+  (swap-data elements assoc-in [key] value))
+
+(defn remove-data [elements key]
+  (swap-data elements dissoc key))
 
 
 ;;;; Manipulation
