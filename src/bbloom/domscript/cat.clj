@@ -8,6 +8,9 @@
 
 (defop0 document-element dom/document-element)
 
+(defop1 element-with-id dom/element-with-id)
+(defop1 elements-with-tag dom/elements-with-tag)
+
 (defop1 parent dom/parent)
 
 (defop1 children dom/children)

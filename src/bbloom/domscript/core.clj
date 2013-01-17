@@ -3,6 +3,15 @@
   (:require [clojure.string :as str]
             [bbloom.domscript.svg :as svg]))
 
+
+;;;; Kernel
+
+(def ^:dynamic *document*)
+
+(def namespaces
+  {"svg" svg/ns-uri})
+
+
 ;;;; Utilities
 
 (defn collify [x]
@@ -17,13 +26,17 @@
     (disj set x)
     (conj set x)))
 
+(defn NodeList->vector [nodes]
+  (let [length (.getLength nodes)]
+    (loop [i 0 v []]
+      (if (< i length)
+        (recur (inc i) (conj v (.item nodes i)))
+        v))))
 
-;;;; Kernel
-
-(def ^:dynamic *document*)
-
-(def namespaces
-  {"svg" svg/ns-uri})
+(defn split-name [x]
+  (if (string? x)
+    [nil x]
+    [(namespaces (namespace x)) (name x)]))
 
 
 ;;;; Traversal
@@ -31,16 +44,18 @@
 (defn document-element []
   (.getDocumentElement *document*))
 
+(defn element-with-id [id]
+  (.getElementById *document* id))
+
+(defn elements-with-tag [tag]
+  (let [[ns name] (split-name tag)]
+    (NodeList->vector (.getElementsByTagNameNS *document* ns name))))
+
 (defn parent [element]
   (.getParentNode element))
 
 (defn children [element]
-  (let [nodes (.getChildNodes element)
-        length (.getLength nodes)]
-    (loop [i 0 children []]
-      (if (< i length)
-        (recur (inc i) (conj children (.item nodes i)))
-        children))))
+  (NodeList->vector (.getChildNodes element)))
 
 
 ;;;; Attributes
@@ -101,9 +116,8 @@
 ;;;; Manipulation
 
 (defn create-element [tag]
-  (if (string? tag)
-    (.createElement *document* tag)
-    (.createElementNS *document* (namespaces (namespace tag)) (name tag))))
+  (let [[ns name] (split-name tag)]
+    (.createElementNS *document* ns name)))
 
 (defn append [parent elements]
   (each-element elements #(.appendChild parent %)))

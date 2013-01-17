@@ -12,19 +12,21 @@
       (binding [*document* document]
         (cat/run
 
+          (elements-with-tag :svg/rect)
+          (set-attribute :fill "blue")
 
-          document-element
-          cat/dup children remove
+          ;document-element
+          ;cat/dup children remove
 
-          (create-element :svg/rect)
-          (toggle-class "foo")
-          (toggle-classes #{"foo" "bar"})
-          classes cat/prn
-          (set-attributes {:x 70 :y 50
-                           :width 10 :height 30
-                           :fill "red"})
-          append
-
+          ;(create-element :svg/rect)
+          ;(toggle-class "foo")
+          ;(toggle-classes #{"foo" "bar"})
+          ;classes cat/prn
+          ;(set-attributes {:id "the-rect"
+          ;                 :x 30 :y 50
+          ;                 :width 10 :height 30
+          ;                 :fill "red"})
+          ;append
 
   ))))
 
