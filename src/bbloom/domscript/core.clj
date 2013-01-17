@@ -43,35 +43,40 @@
 (defn attribute [element attribute]
   (.getAttribute element (name attribute)))
 
-(defn set-attribute [element attribute value]
-  (.setAttribute element (name attribute) (str value)))
+(defn set-attribute [elements attribute value]
+  (each-element elements #(.setAttribute % (name attribute) (str value))))
 
-(defn set-attributes [element attributes]
-  (doseq [[attribute value] attributes]
-    (set-attribute element attribute value)))
+(defn set-attributes [elements attributes]
+  (each-element elements
+    #(doseq [[attribute value] attributes]
+       (set-attribute % attribute value))))
+
+(defn remove-attribute [elements attribute]
+  (each-element elements #(.removeAttribute % (name attribute))))
 
 (defn classes [element]
   (->> (str/split (attribute element :class) #" ")
     (filter seq)
     set))
 
-(defn set-classes [element classes]
-  (set-attribute element :class (str/join " " classes)))
+(defn set-classes [elements classes]
+  (set-attribute elements :class (str/join " " classes)))
 
-(defn update-classes [element f & args]
-  (set-classes element (apply f (classes element) args)))
+(defn update-classes [elements f & args]
+  (each-element elements
+    #(set-classes elements (apply f (classes %) args))))
 
-(defn add-class [element class]
-  (update-classes element conj class))
+(defn add-class [elements class]
+  (update-classes elements conj class))
 
-(defn add-classes [element classes]
-  (update-classes element #(apply conj % classes)))
+(defn add-classes [elements classes]
+  (update-classes elements #(apply conj % classes)))
 
-(defn remove-class [element class]
-  (update-classes element disj class))
+(defn remove-class [elements class]
+  (update-classes elements disj class))
 
-(defn remove-classes [element classes]
-  (update-classes element #(apply disj % classes)))
+(defn remove-classes [elements classes]
+  (update-classes elements #(apply disj % classes)))
 
 (defn has-class? [element class]
   (contains? (classes element) class))

@@ -18,32 +18,32 @@
 (defprim attribute [element attribute -- element]
   (conj $ element (dom/attribute element attribute)))
 
-(defprim set-attribute [element attribute value -- element]
-  (dom/set-attribute element attribute value)
-  (conj $ element))
+(defprim set-attribute [elements attribute value -- elements]
+  (dom/set-attribute elements attribute value)
+  (conj $ elements))
 
-(defprim set-attributes [element attributes -- element]
-  (dom/set-attributes element attributes)
-  (conj $ element))
+(defprim set-attributes [elements attributes -- elements]
+  (dom/set-attributes elements attributes)
+  (conj $ elements))
 
 (defprim classes [element -- classes]
   (conj $ element (dom/classes element)))
 
-(defprim add-class [element class -- element]
-  (dom/add-class element class)
-  (conj $ element))
+(defprim add-class [elements class -- elements]
+  (dom/add-class elements class)
+  (conj $ elements))
 
-(defprim add-classes [element classes -- element]
-  (dom/add-classes element classes)
-  (conj $ element))
+(defprim add-classes [elements classes -- elements]
+  (dom/add-classes elements classes)
+  (conj $ elements))
 
-(defprim remove-class [element class -- element]
-  (dom/remove-class element class)
-  (conj $ element))
+(defprim remove-class [elements class -- elements]
+  (dom/remove-class elements class)
+  (conj $ elements))
 
-(defprim remove-classes [element classes -- element]
-  (dom/remove-classes element classes)
-  (conj $ element))
+(defprim remove-classes [elements classes -- elements]
+  (dom/remove-classes elements classes)
+  (conj $ elements))
 
 (defprim has-class? [element class -- bool]
   (conj $ element (dom/has-class? element class)))
