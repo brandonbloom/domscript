@@ -45,6 +45,9 @@
   (dom/remove-classes element classes)
   (conj $ element))
 
+(defprim has-class? [element class -- bool]
+  (conj $ element (dom/has-class? element class)))
+
 
 ;;;; Manipulation
 

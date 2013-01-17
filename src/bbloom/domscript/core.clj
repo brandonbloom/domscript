@@ -73,6 +73,9 @@
 (defn remove-classes [element classes]
   (update-classes element #(apply disj % classes)))
 
+(defn has-class? [element class]
+  (contains? (classes element) class))
+
 
 ;;;; Manipulation
 
