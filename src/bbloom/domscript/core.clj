@@ -1,6 +1,7 @@
 (ns bbloom.domscript.core
   (:refer-clojure :exclude [remove])
-  (:require [bbloom.domscript.svg :as svg]))
+  (:require [clojure.string :as str]
+            [bbloom.domscript.svg :as svg]))
 
 ;;;; Utilities
 
@@ -11,6 +12,7 @@
   (doseq [element (collify elements)]
     (f element)))
 
+
 ;;;; Kernel
 
 (def ^:dynamic *document*)
@@ -18,10 +20,14 @@
 (def namespaces
   {"svg" svg/ns-uri})
 
+
 ;;;; Traversal
 
 (defn document-element []
   (.getDocumentElement *document*))
+
+(defn parent [element]
+  (.getParentNode element))
 
 (defn children [element]
   (let [nodes (.getChildNodes element)
@@ -31,7 +37,11 @@
         (recur (inc i) (conj children (.item nodes i)))
         children))))
 
+
 ;;;; Attributes
+
+(defn attribute [element attribute]
+  (.getAttribute element (name attribute)))
 
 (defn set-attribute [element attribute value]
   (.setAttribute element (name attribute) (str value)))
@@ -39,6 +49,30 @@
 (defn set-attributes [element attributes]
   (doseq [[attribute value] attributes]
     (set-attribute element attribute value)))
+
+(defn classes [element]
+  (->> (str/split (attribute element :class) #" ")
+    (filter seq)
+    set))
+
+(defn set-classes [element classes]
+  (set-attribute element :class (str/join " " classes)))
+
+(defn update-classes [element f & args]
+  (set-classes element (apply f (classes element) args)))
+
+(defn add-class [element class]
+  (update-classes element conj class))
+
+(defn add-classes [element classes]
+  (update-classes element #(apply conj % classes)))
+
+(defn remove-class [element class]
+  (update-classes element disj class))
+
+(defn remove-classes [element classes]
+  (update-classes element #(apply disj % classes)))
+
 
 ;;;; Manipulation
 
@@ -51,4 +85,4 @@
   (each-element elements #(.appendChild parent %)))
 
 (defn remove [elements]
-  (each-element elements #(.removeChild (.getParent %) %)))
+  (each-element elements #(.removeChild (parent %) %)))
