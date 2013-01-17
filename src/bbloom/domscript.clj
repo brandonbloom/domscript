@@ -13,7 +13,10 @@
         (cat/run
 
           (elements-with-tag :svg/rect)
-          (set-attribute :fill "blue")
+          ;(set-style "fill" "#cc00cc")
+          (set-styles {:fill "#0000cc"})
+          ;(remove-attribute :fill)
+          ;cat/first (style :fill) cat/prn
 
           ;document-element
           ;cat/dup children remove

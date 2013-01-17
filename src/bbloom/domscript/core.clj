@@ -1,7 +1,8 @@
 (ns bbloom.domscript.core
   (:refer-clojure :exclude [remove])
   (:require [clojure.string :as str]
-            [bbloom.domscript.svg :as svg]))
+            [bbloom.domscript.svg :as svg])
+  (:import [org.apache.batik.bridge CSSUtilities]))
 
 
 ;;;; Kernel
@@ -79,10 +80,18 @@
     #(doseq [attribute attributes]
        (.removeAttribute % (name attribute)))))
 
+
+;;;; CSS
+
+;;; Classes
+
 (defn classes [element]
   (->> (str/split (attribute element :class) #" ")
     (filter seq)
     set))
+
+(defn has-class? [element class]
+  (contains? (classes element) class))
 
 (defn set-classes [elements classes]
   (set-attribute elements :class (str/join " " classes)))
@@ -103,14 +112,26 @@
 (defn remove-classes [elements classes]
   (update-classes elements #(apply disj % classes)))
 
-(defn has-class? [element class]
-  (contains? (classes element) class))
-
 (defn toggle-class [elements class]
   (update-classes elements #(toggle-member % class)))
 
 (defn toggle-classes [elements classes]
   (update-classes elements #(reduce toggle-member % classes)))
+
+;;; Styles
+
+(defn style [element property]
+  (.. element getStyle (getPropertyValue (name property))))
+
+(defn set-style [elements property value]
+  (each-element elements
+    #(.. % getStyle (setProperty (name property) value ""))))
+
+(defn set-styles [elements styles]
+  (each-element elements
+    #(doseq [[property value] styles]
+       (.. % getStyle (setProperty (name property) value "")))))
+
 
 
 ;;;; Manipulation

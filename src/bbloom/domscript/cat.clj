@@ -29,8 +29,24 @@
   (dom/set-attributes elements attributes)
   (conj $ elements))
 
-(defprim classes [element -- classes]
+(defprim remove-attribute [elements attribute -- elements]
+  (dom/remove-attribute elements attribute)
+  (conj $ elements))
+
+(defprim remove-attributes [elements attributes -- elements]
+  (dom/remove-attributes elements attributes)
+  (conj $ elements))
+
+
+;;;; CSS
+
+;;; Classes
+
+(defprim classes [element -- element classes]
   (conj $ element (dom/classes element)))
+
+(defprim has-class? [element class -- element bool]
+  (conj $ element (dom/has-class? element class)))
 
 (defprim add-class [elements class -- elements]
   (dom/add-class elements class)
@@ -48,9 +64,6 @@
   (dom/remove-classes elements classes)
   (conj $ elements))
 
-(defprim has-class? [element class -- bool]
-  (conj $ element (dom/has-class? element class)))
-
 (defprim toggle-class [elements class -- elements]
   (dom/toggle-class elements class)
   (conj $ elements))
@@ -59,6 +72,16 @@
   (dom/toggle-classes elements classes)
   (conj $ elements))
 
+;;; Styles
+
+(defprim style [element property -- element value]
+  (conj $ element (dom/style element property)))
+
+(defprim set-style [elements property value -- elements]
+  (conj $ elements (dom/set-style elements property value)))
+
+(defprim set-styles [elements styles -- elements]
+  (conj $ elements (dom/set-styles elements styles)))
 
 
 ;;;; Manipulation
