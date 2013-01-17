@@ -48,6 +48,15 @@
 (defprim has-class? [element class -- bool]
   (conj $ element (dom/has-class? element class)))
 
+(defprim toggle-class [elements class -- elements]
+  (dom/toggle-class elements class)
+  (conj $ elements))
+
+(defprim toggle-classes [elements classes -- elements]
+  (dom/toggle-classes elements classes)
+  (conj $ elements))
+
+
 
 ;;;; Manipulation
 

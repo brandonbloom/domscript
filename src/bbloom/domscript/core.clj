@@ -12,6 +12,11 @@
   (doseq [element (collify elements)]
     (f element)))
 
+(defn toggle-member [set x]
+  (if (contains? set x)
+    (disj set x)
+    (conj set x)))
+
 
 ;;;; Kernel
 
@@ -54,6 +59,11 @@
 (defn remove-attribute [elements attribute]
   (each-element elements #(.removeAttribute % (name attribute))))
 
+(defn remove-attributes [elements attributes]
+  (each-element elements
+    #(doseq [attribute attributes]
+       (.removeAttribute % (name attribute)))))
+
 (defn classes [element]
   (->> (str/split (attribute element :class) #" ")
     (filter seq)
@@ -80,6 +90,12 @@
 
 (defn has-class? [element class]
   (contains? (classes element) class))
+
+(defn toggle-class [elements class]
+  (update-classes elements #(toggle-member % class)))
+
+(defn toggle-classes [elements classes]
+  (update-classes elements #(reduce toggle-member % classes)))
 
 
 ;;;; Manipulation
