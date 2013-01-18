@@ -53,10 +53,10 @@
     (NodeList->vector (.getElementsByTagNameNS *document* ns name))))
 
 (defn parent [element]
-  (.getParentNode element))
+  (.getParentNode element))  ;;TODO return a coll if arg is coll
 
 (defn children [element]
-  (NodeList->vector (.getChildNodes element)))
+  (NodeList->vector (.getChildNodes element))) ;;TODO mapcat
 
 
 ;;;; Attributes
@@ -156,6 +156,17 @@
 
 (defn remove-data [elements key]
   (swap-data elements dissoc key))
+
+
+;;;; Dimensions
+
+
+;;;; Effects
+; Should I bother with these? Do these belong in another library?
+
+
+;;;; Events
+
 
 
 ;;;; Manipulation
