@@ -25,22 +25,23 @@
     ; Changing these ^^ doesn't affect the frame or canvas yet.
   )
 
-
-
   (go
     document-element
     children remove
   )
-
   (go
     document-element
     (create-element :svg/rect)
     (set-attributes {:id "the-rect"
-                     :x 0 :y 0
-                     :width 639 :height 479
+                     :x 250 :y 75
+                     :width 100 :height 50
                      :fill "red"})
     append
   )
+
+  (go
+    (select "#the-rect")
+    cat/count cat/prn)
 
     ;(elements-with-tag :svg/rect)
     ;cat/first

@@ -37,8 +37,10 @@
   document-element  [    -- element]
   element-with-id   [id  -- element]
   elements-with-tag [tag -- elements]
-  parent   [element -- element parent]
-  children [element -- element children]
+  select    [selector -- elements]
+  subselect [element selector -- element elements]
+  parent    [element -- element parent]
+  children  [element -- element children]
 
   ;;;; Attributes
   attribute         [element  attribute       -- element value]

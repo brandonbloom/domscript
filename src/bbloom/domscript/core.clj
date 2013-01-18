@@ -1,8 +1,7 @@
 (ns bbloom.domscript.core
   (:refer-clojure :exclude [remove])
   (:require [clojure.string :as str]
-            [bbloom.domscript.svg :as svg])
-  (:import [org.apache.batik.bridge CSSUtilities]))
+            [bbloom.domscript.svg :as svg]))   ;TODO eliminate svg dependency?
 
 
 ;;;; Kernel
@@ -51,6 +50,14 @@
 (defn elements-with-tag [tag]
   (let [[ns name] (split-name tag)]
     (NodeList->vector (.getElementsByTagNameNS *document* ns name))))
+
+(defn select
+  ([selector] (select (document-element) selector))
+  ([root selector]
+    (vec (svg/selection-seq root selector))))
+
+(defn subselect [root selector] ;NOTE exists for ease of cat-ops
+  (select root selector))
 
 (defn parent [element]
   (.getParentNode element))  ;;TODO return a coll if arg is coll
