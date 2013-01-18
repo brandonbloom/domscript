@@ -1,116 +1,79 @@
 (ns bbloom.domscript.cat
   (:refer-clojure :exclude [remove])
-  (:require [factjor.core :as cat
-             :refer (defprim defword defvoid0 defvoid1 defop0 defop1 defop2)]
+  (:require [factjor.core :as cat :refer (defprim)]
             [bbloom.domscript.core :as dom]))
 
-;;;; Traversal
+;;; Helper macros that belong in Factjor
 
-(defop0 document-element dom/document-element)
+(defn parse-stack-effect [effect]
+  (let [[inputs [sep & outputs]] (split-with (complement '#{--}) effect)]
+    (assert (= sep '--) "Expected '-- in stack effect")
+    {:inputs (vec inputs) :outputs (vec outputs)}))
 
-(defop1 element-with-id dom/element-with-id)
-(defop1 elements-with-tag dom/elements-with-tag)
+(defn cat-op-form [f effect]
+  (let [{:keys [inputs outputs]} (parse-stack-effect effect)
+        input-set (set inputs)
+        return-values (clojure.core/remove input-set outputs)
+        result-sym (gensym)
+        output-map {(first return-values) result-sym}
+        conj-syms (map #(get output-map % %) outputs)]
+    (assert (<= (count return-values) 1)
+            (str "Unable to infer " f " output stack from: " effect))
+  `(defprim ~(-> f name symbol) ~inputs
+     (let [~result-sym (~f ~@inputs)]
+       ~(if (empty? conj-syms)
+          '$
+          `(conj ~'$ ~@conj-syms))))))
 
-(defop1 parent dom/parent)
-
-(defop1 children dom/children)
-
-
-;;;; Attributes
-
-(defprim attribute [element attribute -- element]
-  (conj $ element (dom/attribute element attribute)))
-
-(defprim set-attribute [elements attribute value -- elements]
-  (dom/set-attribute elements attribute value)
-  (conj $ elements))
-
-(defprim set-attributes [elements attributes -- elements]
-  (dom/set-attributes elements attributes)
-  (conj $ elements))
-
-(defprim remove-attribute [elements attribute -- elements]
-  (dom/remove-attribute elements attribute)
-  (conj $ elements))
-
-(defprim remove-attributes [elements attributes -- elements]
-  (dom/remove-attributes elements attributes)
-  (conj $ elements))
+(defmacro cat-ops [ns & op-specs]
+  (let [ns (name ns)]
+    `(do ~@(for [[nm effect] (partition 2 op-specs)]
+             (cat-op-form (symbol ns (name nm)) effect)))))
 
 
-;;;; CSS
+(cat-ops dom
 
-;;; Classes
+  ;;;; Traversal
+  document-element  [    -- element]
+  element-with-id   [id  -- element]
+  elements-with-tag [tag -- elements]
+  parent   [element -- element parent]
+  children [element -- element children]
 
-(defprim classes [element -- element classes]
-  (conj $ element (dom/classes element)))
+  ;;;; Attributes
+  attribute         [element  attribute       -- element value]
+  set-attribute     [elements attribute value -- elements]
+  set-attributes    [elements attributes      -- elements]
+  remove-attribute  [elements attribute       -- elements]
+  remove-attributes [elements attributes      -- elements]
 
-(defprim has-class? [element class -- element bool]
-  (conj $ element (dom/has-class? element class)))
+  ;;;; CSS
 
-(defprim set-classes [elements classes -- elements]
-  (dom/set-classes elements classes)
-  (conj $ elements))
+  ;;; Classes
+  classes        [element          -- element  classes]
+  has-class?     [element  class   -- element  bool]
+  set-classes    [elements classes -- elements]
+  add-class      [elements class   -- elements]
+  add-classes    [elements classes -- elements]
+  remove-class   [elements class   -- elements]
+  remove-classes [elements classes -- elements]
+  toggle-class   [elements class   -- elements]
+  toggle-classes [elements classes -- elements]
 
-(defprim add-class [elements class -- elements]
-  (dom/add-class elements class)
-  (conj $ elements))
+  ;;; Styles
+  style      [element  property       -- element value]
+  set-style  [elements property value -- elements     ]
+  set-styles [elements styles         -- elements     ]
 
-(defprim add-classes [elements classes -- elements]
-  (dom/add-classes elements classes)
-  (conj $ elements))
+  ;;;; Data
+  all-data    [element            -- element data]
+  get-data    [element  key       -- data        ]
+  add-data    [elements key value -- elements    ]
+  remove-data [elements key       -- elements    ]
 
-(defprim remove-class [elements class -- elements]
-  (dom/remove-class elements class)
-  (conj $ elements))
+  ;;;; Manipulation
+  create-element [tag -- element]
+  append [parent elements -- parent]
+  remove [elements --]
 
-(defprim remove-classes [elements classes -- elements]
-  (dom/remove-classes elements classes)
-  (conj $ elements))
-
-(defprim toggle-class [elements class -- elements]
-  (dom/toggle-class elements class)
-  (conj $ elements))
-
-(defprim toggle-classes [elements classes -- elements]
-  (dom/toggle-classes elements classes)
-  (conj $ elements))
-
-;;; Styles
-
-(defprim style [element property -- element value]
-  (conj $ element (dom/style element property)))
-
-(defprim set-style [elements property value -- elements]
-  (conj $ elements (dom/set-style elements property value)))
-
-(defprim set-styles [elements styles -- elements]
-  (conj $ elements (dom/set-styles elements styles)))
-
-
-;;;; Data
-
-(defprim all-data [element -- element data]
-  (conj $ element (dom/all-data element)))
-
-(defprim get-data [element key]
-  (conj $ element (dom/get-data element key)))
-
-(defprim add-data [elements key value -- elements]
-  (dom/add-data elements key value)
-  (conj $ elements))
-
-(defprim remove-data [elements key -- elements]
-  (dom/remove-data elements key)
-  (conj $ elements))
-
-
-;;;; Manipulation
-
-(defop1 create-element dom/create-element)
-
-(defprim append [parent elements -- parent]
-  (dom/append parent elements)
-  (conj $ parent))
-
-(defvoid1 remove dom/remove)
+)
