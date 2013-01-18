@@ -1,5 +1,6 @@
 (ns bbloom.domscript.svg
   (:import [org.apache.batik.dom.svg SVGDOMImplementation]
+           [java.awt Dimension]
            [javax.swing JFrame]
            [org.apache.batik.swing JSVGCanvas]))
 
@@ -22,7 +23,7 @@
         (.setAttribute "width" (str width))
         (.setAttribute "height" (str height)))
       (doto canvas
-        (.setSize width height)
+        (.setPreferredSize (Dimension. width height))
         (.setDocumentState JSVGCanvas/ALWAYS_DYNAMIC)
         (.setSVGDocument document))
       (doto frame
