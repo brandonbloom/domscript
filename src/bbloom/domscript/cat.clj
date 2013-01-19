@@ -41,6 +41,7 @@
   subselect [element selector -- element elements]
   parent    [element -- element parent]
   children  [element -- element children]
+  descendents [element -- element descendents]
 
   ;;;; Attributes
   attribute         [element  attribute       -- element value]

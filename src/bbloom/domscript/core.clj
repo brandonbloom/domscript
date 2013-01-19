@@ -50,12 +50,13 @@
 
 (defn elements-with-tag [tag]
   (let [[ns name] (split-name tag)]
+    ;TODO ->seq ?
     (NodeList->vector (.getElementsByTagNameNS *document* ns name))))
 
 (defn select
   ([selector] (select (document-element) selector))
   ([root selector]
-    (vec (svg/selection-seq root selector))))
+    (svg/selection-seq root selector)))
 
 (defn subselect [root selector] ;NOTE exists for ease of cat-ops
   (select root selector))
@@ -64,7 +65,13 @@
   (.getParentNode element))  ;;TODO return a coll if arg is coll
 
 (defn children [element]
-  (NodeList->vector (.getChildNodes element))) ;;TODO mapcat
+  (NodeList->vector (.getChildNodes element))) ;;TODO mapcat element(s)
+
+(defn element-seq [root]
+  (subselect root "*"))
+
+(defn descendents [element]
+  (next (element-seq)))
 
 
 ;;;; Attributes
@@ -175,24 +182,67 @@
 
 ;;;; Events
 
-(def ^:private handlers (atom {}))
-
-(def ^:private conjs (fnil conj #{}))
+;;TODO make this part of the window / document
+(def ^:private handlers
+  "Indexes event listeners for removal by element key or by element.
+  [:elements element event-ns event-name listener] => key
+  [:keys key event-ns event-name listener] => #{elements}"
+  (atom {}))
 
 (defn bind [elements event-type key callback]
-  (let [[ns name] (split-name event-type)
+  (let [elements (set (collify elements))
+        [ns name] (split-name event-type)
         listener (reify EventListener
                    (handleEvent [_ evt]
                      (callback evt)))]
-    (swap! handlers update-in [key [ns name]] conjs [listener elements])
+    (swap! handlers
+      (fn [handlers]
+        (reduce
+          (fn [handlers element]
+            (assoc-in handlers [:elements element ns name listener] key))
+          (assoc-in handlers [:keys key ns name listener] elements)
+          elements)))
     (each-element elements
       #(.addEventListenerNS % ns name listener false nil))))
 
+(defn- prune-empty [m ks]
+  (if (and (next ks) (empty? (get-in m ks)))
+    (let [ks* (pop ks)]
+      (recur (update-in m ks* dissoc (peek ks)) ks*))
+    m))
+
+(defn- clean-listeners [args]
+  (swap! handlers
+    (fn [handlers]
+      (reduce
+        (fn [handlers [element key ns name listener :as x]]
+          (-> handlers
+            ;; Bulk removal would be more efficient, but there's a deref race
+            (update-in [:keys key ns name listener] disj element)
+            (prune-empty [:keys key ns name listener])
+            (update-in [:elements element ns name] dissoc listener)
+            (prune-empty [:elements element ns name listener])))
+        handlers
+        args))))
+
 (defn unbind [key]
-  (doseq [[[ns name] groups] (@handlers key)
-          [listener elements] groups]
-    (each-element elements
-      #(.removeEventListenerNS % ns name listener false))))
+  (let [args (for [[ns names] (get-in @handlers [:keys key])
+                   [name listeners] names
+                   [listener elements] listeners
+                   element elements]
+                [element key ns name listener])]
+    (clean-listeners args)
+    (doseq [[element key ns name listener] args]
+      (.removeEventListenerNS element ns name listener false))))
+
+(defn- clean [elements]
+  (let [handlers @handlers
+        args (for [element (collify elements)
+                   [ns names] (get-in handlers [:elements element])
+                   [name listeners] names
+                   [listener key] listeners]
+               [element key ns name listener])]
+    (clean-listeners args)))
 
 
 ;;;; Manipulation
@@ -205,4 +255,8 @@
   (each-element elements #(.appendChild parent %)))
 
 (defn remove [elements]
-  (each-element elements #(.removeChild (parent %) %)))
+  (doseq [element (collify elements)]
+    (doseq [descendent (descendents element)]
+      (clean descendent))
+    (clean element)
+    (.removeChild (parent element) element)))

@@ -27,6 +27,10 @@
 
   (go
     document-element
+    descendents cat/prn)
+
+  (go
+    document-element
     children remove
   )
   (go
