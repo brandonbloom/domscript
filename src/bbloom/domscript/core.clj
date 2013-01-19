@@ -186,21 +186,24 @@
 ;;   [:elements element event-ns event-name listener] => key
 ;;   [:keys key event-ns event-name listener] => #{elements}
 
-(defn bind [elements event-type key callback]
-  (let [elements (set (collify elements))
-        [ns name] (split-name event-type)
-        listener (reify EventListener
-                   (handleEvent [_ evt]
-                     (callback evt)))]
-    (update-in *window* [:handlers] swap!
-      (fn [handlers]
-        (reduce
-          (fn [handlers element]
-            (assoc-in handlers [:elements element ns name listener] key))
-          (assoc-in handlers [:keys key ns name listener] elements)
-          elements)))
-    (each-element elements
-      #(.addEventListenerNS % ns name listener false nil))))
+(defn bind
+  ([elements event-type callback]
+    (bind elements event-type callback callback))
+  ([elements event-type key callback]
+    (let [elements (set (collify elements))
+          [ns name] (split-name event-type)
+          listener (reify EventListener
+                     (handleEvent [_ evt]
+                       (callback evt)))]
+      (update-in *window* [:handlers] swap!
+        (fn [handlers]
+          (reduce
+            (fn [handlers element]
+              (assoc-in handlers [:elements element ns name listener] key))
+            (assoc-in handlers [:keys key ns name listener] elements)
+            elements)))
+      (each-element elements
+        #(.addEventListenerNS % ns name listener false nil)))))
 
 (defn- prune-empty [m ks]
   (if (and (next ks) (empty? (get-in m ks)))
