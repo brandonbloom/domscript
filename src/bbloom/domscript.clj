@@ -39,9 +39,25 @@
     append
   )
 
+  (defn random-rect []
+    (let [w (+ (rand-int 75) 25)
+          h (+ (rand-int 75) 25)
+          x (rand-int (- 640 w))
+          y (rand-int (- 480 h))
+          c (rand-nth ["red" "green" "blue" "yellow" "orange"])]
+      [(create-element :svg/rect)
+       (set-attributes {:x x :y y :width w :height h :fill c})
+       append]))
+
   (go
-    (select "#the-rect")
-    cat/count cat/prn)
+    document-element
+    (apply concat (repeatedly 5 random-rect)) cat/call)
+
+  (go
+    (select "rect[fill=red]")
+    (set-attribute :stroke-width 3)
+    (set-attribute :stroke "black")
+    )
 
     ;(elements-with-tag :svg/rect)
     ;cat/first
