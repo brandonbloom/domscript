@@ -73,6 +73,10 @@
   add-data    [elements key value -- elements    ]
   remove-data [elements key       -- elements    ]
 
+  ;;;; Events
+  bind [elements event-type key callback -- elements]
+  unbind [key -- elements]
+
   ;;;; Manipulation
   create-element [tag -- element]
   append [parent elements -- parent]

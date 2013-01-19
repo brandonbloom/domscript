@@ -57,7 +57,11 @@
     (select "rect[fill=red]")
     (set-attribute :stroke-width 3)
     (set-attribute :stroke "black")
+    (bind :click ::foo (fn [event] (prn event)))
     )
+
+  (go
+    (unbind ::foo))
 
     ;(elements-with-tag :svg/rect)
     ;cat/first

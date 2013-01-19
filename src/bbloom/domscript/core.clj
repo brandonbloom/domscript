@@ -1,7 +1,8 @@
 (ns bbloom.domscript.core
   (:refer-clojure :exclude [remove])
   (:require [clojure.string :as str]
-            [bbloom.domscript.svg :as svg]))   ;TODO eliminate svg dependency?
+            [bbloom.domscript.svg :as svg])
+  (:import [org.w3c.dom.events EventListener]))
 
 
 ;;;; Kernel
@@ -174,6 +175,24 @@
 
 ;;;; Events
 
+(def ^:private handlers (atom {}))
+
+(def ^:private conjs (fnil conj #{}))
+
+(defn bind [elements event-type key callback]
+  (let [[ns name] (split-name event-type)
+        listener (reify EventListener
+                   (handleEvent [_ evt]
+                     (callback evt)))]
+    (swap! handlers update-in [key [ns name]] conjs [listener elements])
+    (each-element elements
+      #(.addEventListenerNS % ns name listener false nil))))
+
+(defn unbind [key]
+  (doseq [[[ns name] groups] (@handlers key)
+          [listener elements] groups]
+    (each-element elements
+      #(.removeEventListenerNS % ns name listener false))))
 
 
 ;;;; Manipulation
