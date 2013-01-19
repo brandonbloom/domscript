@@ -3,7 +3,7 @@
   (:use [bbloom.domscript.cat])
   (:require [factjor.core :as cat]
             [bbloom.domscript.svg :as svg]
-            [bbloom.domscript.core :refer (*document*)]))
+            [bbloom.domscript.core :refer (*window*)]))
 
 
 
@@ -12,17 +12,16 @@
   (def window (svg/create-window))
 
   (defn go [& code]
-    (svg/update-document! window
-      (fn [document]
-        (binding [*document* document]
-          (cat/run code cat/call)))))
+    (svg/send window
+      #(binding [*window* window]
+         (cat/run code cat/call))))
 
   (go
     document-element
     (attribute :title) cat/prn
     (attribute :width) cat/prn
     (attribute :height) cat/prn
-    ; Changing these ^^ doesn't affect the frame or canvas yet.
+    ;TODO Changing these ^^ doesn't affect the frame or canvas yet.
   )
 
   (go
@@ -66,6 +65,8 @@
 
   (go
     (unbind ::foo))
+
+  (:handlers window)
 
     ;(elements-with-tag :svg/rect)
     ;cat/first

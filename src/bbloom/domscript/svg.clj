@@ -1,4 +1,5 @@
 (ns bbloom.domscript.svg
+  (:refer-clojure :exclude [send])
   (:import [org.apache.batik.dom.svg SVGDOMImplementation]
            [java.awt Dimension]
            [javax.swing JFrame]
@@ -37,11 +38,12 @@
         (.setVisible true))
       {:canvas canvas
        :frame frame
-       :document document})))
+       :document document
+       :handlers (atom nil)})))
 
-(defn update-document! [window f & args]
+(defn send [window f & args]
   (.. (:canvas window) getUpdateManager getUpdateRunnableQueue
-    (invokeLater #(apply f (:document window) args))))
+    (invokeLater #(apply f args))))
 
 (def ^:private condition-factory
   (CSSConditionFactory. nil "class" nil "id"))

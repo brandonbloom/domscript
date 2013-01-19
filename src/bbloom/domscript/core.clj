@@ -7,7 +7,7 @@
 
 ;;;; Kernel
 
-(def ^:dynamic *document*)
+(def ^:dynamic *window*)
 
 (def namespaces
   {"svg" svg/ns-uri})
@@ -16,7 +16,7 @@
 ;;;; Utilities
 
 (defn collify [x]
-  (if (coll? x) x [x]))
+  (if (or (nil? x) (coll? x)) x [x]))
 
 (defn each-element [elements f]
   (doseq [element (collify elements)]
@@ -43,15 +43,15 @@
 ;;;; Traversal
 
 (defn document-element []
-  (.getDocumentElement *document*))
+  (.getDocumentElement (:document *window*)))
 
 (defn element-with-id [id]
-  (.getElementById *document* id))
+  (.getElementById (:document *window*) id))
 
 (defn elements-with-tag [tag]
   (let [[ns name] (split-name tag)]
     ;TODO ->seq ?
-    (NodeList->vector (.getElementsByTagNameNS *document* ns name))))
+    (NodeList->vector (.getElementsByTagNameNS (:document *window*) ns name))))
 
 (defn select
   ([selector] (select (document-element) selector))
@@ -71,7 +71,7 @@
   (subselect root "*"))
 
 (defn descendents [element]
-  (next (element-seq)))
+  (next (element-seq element)))
 
 
 ;;;; Attributes
@@ -182,12 +182,9 @@
 
 ;;;; Events
 
-;;TODO make this part of the window / document
-(def ^:private handlers
-  "Indexes event listeners for removal by element key or by element.
-  [:elements element event-ns event-name listener] => key
-  [:keys key event-ns event-name listener] => #{elements}"
-  (atom {}))
+;; Listeners are indexed by key and by element in (:handlers *window*)
+;;   [:elements element event-ns event-name listener] => key
+;;   [:keys key event-ns event-name listener] => #{elements}
 
 (defn bind [elements event-type key callback]
   (let [elements (set (collify elements))
@@ -195,7 +192,7 @@
         listener (reify EventListener
                    (handleEvent [_ evt]
                      (callback evt)))]
-    (swap! handlers
+    (update-in *window* [:handlers] swap!
       (fn [handlers]
         (reduce
           (fn [handlers element]
@@ -212,7 +209,7 @@
     m))
 
 (defn- clean-listeners [args]
-  (swap! handlers
+  (update-in *window* [:handlers] swap!
     (fn [handlers]
       (reduce
         (fn [handlers [element key ns name listener :as x]]
@@ -226,7 +223,7 @@
         args))))
 
 (defn unbind [key]
-  (let [args (for [[ns names] (get-in @handlers [:keys key])
+  (let [args (for [[ns names] (get-in @(:handlers *window*) [:keys key])
                    [name listeners] names
                    [listener elements] listeners
                    element elements]
@@ -236,7 +233,7 @@
       (.removeEventListenerNS element ns name listener false))))
 
 (defn- clean [elements]
-  (let [handlers @handlers
+  (let [handlers @(:handlers *window*)
         args (for [element (collify elements)
                    [ns names] (get-in handlers [:elements element])
                    [name listeners] names
@@ -249,7 +246,7 @@
 
 (defn create-element [tag]
   (let [[ns name] (split-name tag)]
-    (.createElementNS *document* ns name)))
+    (.createElementNS (:document *window*) ns name)))
 
 (defn append [parent elements]
   (each-element elements #(.appendChild parent %)))
