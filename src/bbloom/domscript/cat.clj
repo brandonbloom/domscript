@@ -1,7 +1,9 @@
 (ns bbloom.domscript.cat
   (:refer-clojure :exclude [remove])
   (:require [factjor.core :as cat :refer (defprim)]
-            [factjor.interop :refer (cat-ops)]))
+            [factjor.interop :refer (cat-ops)]
+            [bbloom.domscript.core :as dom]
+            [bbloom.domscript.svg :as svg]))
 
 (cat-ops dom
 
@@ -56,3 +58,8 @@
   remove [elements --]
 
 )
+
+(defn run [window & code]
+  (svg/send window
+    #(binding [dom/*window* window]
+       (apply cat/run code))))
