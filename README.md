@@ -4,7 +4,7 @@ DomScript aims to be to browsers what PostScript is to printers.
 
 It's a DOM manipulation library for Clojure in the concatenative paradigm.
 
-## What does this have to do with Printers?
+### What does this have to do with Printers?
 
 Coming soon: Video of my talk on Concatenative Clojure from Clojure/West 2013.
 
