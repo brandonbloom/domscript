@@ -38,7 +38,7 @@ motivate JVM-first development. Priority #1 is to design the concatenative API.
 )
 ```
 
-See [cat.clj](./src/bbloom/domscript/cat.clj) for a complete listing of Factjure words.
+See [cat.clj](./src/bbloom/domscript/cat.clj) for a complete listing of [Factjor](https://github.com/brandonbloom/factjor) words.
 
 # License
 
