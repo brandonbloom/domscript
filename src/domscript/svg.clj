@@ -1,4 +1,4 @@
-(ns bbloom.domscript.svg
+(ns domscript.svg
   (:refer-clojure :exclude [send])
   (:import [org.apache.batik.dom.svg SVGDOMImplementation]
            [java.awt Dimension]

@@ -22,8 +22,8 @@ motivate JVM-first development. Priority #1 is to design the concatenative API.
 
 ```clojure
 (require '[factjor.core :as cat])
-(require '[bbloom.domscript.svg :as svg])
-(require '[bbloom.domscript.cat :as dom])
+(require '[domscript.svg :as svg])
+(require '[domscript.cat :as dom])
 
 (def window (svg/create-window))
 
@@ -38,7 +38,7 @@ motivate JVM-first development. Priority #1 is to design the concatenative API.
 )
 ```
 
-See [cat.clj](./src/bbloom/domscript/cat.clj) for a complete listing of [Factjor](https://github.com/brandonbloom/factjor) words.
+See [cat.clj](./src/domscript/cat.clj) for a complete listing of [Factjor](https://github.com/brandonbloom/factjor) words.
 
 # License
 

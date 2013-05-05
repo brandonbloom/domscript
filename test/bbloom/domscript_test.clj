@@ -1,6 +1,6 @@
-(ns bbloom.domscript-test
+(ns domscript-test
   (:use clojure.test
-        bbloom.domscript))
+        domscript))
 
 (deftest a-test
   (testing "FIXME, I fail."

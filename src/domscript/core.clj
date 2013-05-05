@@ -1,7 +1,7 @@
-(ns bbloom.domscript.core
+(ns domscript.core
   (:refer-clojure :exclude [remove])
   (:require [clojure.string :as str]
-            [bbloom.domscript.svg :as svg])
+            [domscript.svg :as svg])
   (:import [org.w3c.dom.events EventListener]))
 
 

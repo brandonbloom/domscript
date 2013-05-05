@@ -1,9 +1,9 @@
-(ns bbloom.domscript
+(ns domscript
   (:refer-clojure :exclude [remove])
-  (:use [bbloom.domscript.cat])
+  (:use [domscript.cat])
   (:require [factjor.core :as cat]
-            [bbloom.domscript.svg :as svg]
-            [bbloom.domscript.core :refer (*window*)]))
+            [domscript.svg :as svg]
+            [domscript.core :refer (*window*)]))
 
 
 

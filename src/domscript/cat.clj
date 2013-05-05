@@ -1,9 +1,9 @@
-(ns bbloom.domscript.cat
+(ns domscript.cat
   (:refer-clojure :exclude [remove])
   (:require [factjor.core :as cat :refer (defprim)]
             [factjor.interop :refer (cat-ops)]
-            [bbloom.domscript.core :as dom]
-            [bbloom.domscript.svg :as svg]))
+            [domscript.core :as dom]
+            [domscript.svg :as svg]))
 
 (cat-ops dom
 
