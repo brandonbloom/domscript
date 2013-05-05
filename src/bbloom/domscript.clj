@@ -14,7 +14,7 @@
   (defn go [& code]
     (svg/send window
       #(binding [*window* window]
-         (cat/run code cat/call))))
+         (apply cat/run code))))
 
   (go
     document-element
