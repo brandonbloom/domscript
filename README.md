@@ -6,7 +6,7 @@ It's a DOM manipulation library for Clojure in the concatenative paradigm.
 
 ### What does this have to do with Printers?
 
-Coming soon: Video of my talk on Concatenative Clojure from Clojure/West 2013.
+See Video: [Concatenative Clojure at Clojure/WEST 2013][1].
 
 # Status
 
@@ -38,10 +38,14 @@ motivate JVM-first development. Priority #1 is to design the concatenative API.
 )
 ```
 
-See [cat.clj](./src/domscript/cat.clj) for a complete listing of [Factjor](https://github.com/brandonbloom/factjor) words.
+See [cat.clj][2] for a complete listing of [Factjor][3] words.
 
 # License
 
 Copyright © 2013 Brandon Bloom
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+[1]: http://www.infoq.com/presentations/concatenative-clojure
+[2]: ./src/domscript/cat.clj
+[3]: https://github.com/brandonbloom/factjor
